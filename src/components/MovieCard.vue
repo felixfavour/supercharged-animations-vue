@@ -39,6 +39,7 @@ img {
   border-radius: 6px;
   object-fit: cover;
   transition: 0.3s;
+  height: 350px;
 }
 
 h5.card-text {
