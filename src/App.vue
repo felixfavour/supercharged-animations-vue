@@ -1,10 +1,24 @@
 <script setup>
 import MovieCard from './components/MovieCard.vue';
 import movies from './assets/movies'
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const query = ref('')
 const searchQuery = ref('')
+
+movies.forEach(movie => {
+  delete movie.cast
+  delete movie.extract
+  delete movie.href
+})
+
+const filteredMovies = computed(() => {
+  const filteredMovies = movies.filter(movie => JSON.stringify(movie).includes(query.value))
+  if (searchQuery.value) {
+    return filteredMovies.filter(movie => JSON.stringify(movie).toLowerCase().includes(searchQuery.value.toLowerCase()))
+  }
+  return query.value ? filteredMovies : movies
+})
 </script>
 
 <template>
@@ -13,6 +27,7 @@ const searchQuery = ref('')
       <h1>Movie Grid</h1>
       <input type="search" v-model="searchQuery" placeholder="Search Movies">
       <div class="button-group">
+        <button @click="query = ''" :class="{ active: query === '' }">Clear Filters</button>
         <button @click="query = '2021'" :class="{ active: query === '2021' }">2021</button>
         <button @click="query = '2022'" :class="{ active: query === '2022' }">2022</button>
         <button @click="query = 'Action'" :class="{ active: query === 'Action' }">Action</button>
@@ -24,7 +39,7 @@ const searchQuery = ref('')
       </div>
     </header>
     <div class="movie-grid">
-      <MovieCard v-for="movie in movies" :key="movie.href" :movie="movie" />
+      <MovieCard v-for="movie in filteredMovies" :key="movie.href" :movie="movie" />
     </div>
   </main>
 </template>
@@ -95,9 +110,9 @@ h1 {
   }
 }
 
-@media screen and (max-width: 600px) {
+/* @media screen and (max-width: 600px) {
   .movie-grid {
     grid-template-columns: repeat(1, 1fr);
   }
-}
+} */
 </style>
