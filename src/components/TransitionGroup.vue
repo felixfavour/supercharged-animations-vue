@@ -3,6 +3,7 @@ import MovieCard from './MovieCard.vue';
 import movies from '../assets/movies'
 import { ref, computed } from 'vue';
 
+const filtersVisible = ref(false)
 const query = ref('')
 const searchQuery = ref('')
 
@@ -24,22 +25,33 @@ const filteredMovies = computed(() => {
 <template>
   <main>
     <header>
-      <h1>Movie Grid</h1>
-      <input type="search" v-model="searchQuery" placeholder="Search Movies">
-      <div class="button-group">
-        <button @click="query = ''" :class="{ active: query === '' }">Clear Filters</button>
-        <button @click="query = '2021'" :class="{ active: query === '2021' }">2021</button>
-        <button @click="query = '2022'" :class="{ active: query === '2022' }">2022</button>
-        <button @click="query = 'Action'" :class="{ active: query === 'Action' }">Action</button>
-        <button @click="query = 'Comedy'" :class="{ active: query === 'Comedy' }">Comedy</button>
-        <button @click="query = 'Horror'" :class="{ active: query === 'Horror' }">Horror</button>
-        <button @click="query = 'Romance'" :class="{ active: query === 'Romance' }">Romance</button>
-        <button @click="query = 'Adventure'" :class="{ active: query === 'Adventure' }">Adventure</button>
-        <button @click="query = 'Documentary'" :class="{ active: query === 'Documentary' }">Documentary</button>
+      <div class="header-flex">
+
+        <h1>Movie Grid</h1>
+        <button @click="filtersVisible = !filtersVisible">
+          {{  filtersVisible ? 'Hide Filters' : 'Show Filters'  }}
+        </button>
       </div>
+
+      <Transition>
+        <div v-show="filtersVisible" class="header-filters">
+          <input type="search" v-model="searchQuery" placeholder="Search Movies">
+          <div class="button-group">
+            <button @click="query = ''" :class="{ active: query === '' }">Clear Filters</button>
+            <button @click="query = '2021'" :class="{ active: query === '2021' }">2021</button>
+            <button @click="query = '2022'" :class="{ active: query === '2022' }">2022</button>
+            <button @click="query = 'Action'" :class="{ active: query === 'Action' }">Action</button>
+            <button @click="query = 'Comedy'" :class="{ active: query === 'Comedy' }">Comedy</button>
+            <button @click="query = 'Horror'" :class="{ active: query === 'Horror' }">Horror</button>
+            <button @click="query = 'Romance'" :class="{ active: query === 'Romance' }">Romance</button>
+            <button @click="query = 'Adventure'" :class="{ active: query === 'Adventure' }">Adventure</button>
+            <button @click="query = 'Documentary'" :class="{ active: query === 'Documentary' }">Documentary</button>
+          </div>
+        </div>
+      </Transition>
     </header>
     <div class="movie-grid">
-      <TransitionGroup>
+      <TransitionGroup name="list">
         <MovieCard v-for="movie in filteredMovies" :key="movie.title" :movie="movie" />
       </TransitionGroup>
     </div>
@@ -49,13 +61,26 @@ const filteredMovies = computed(() => {
 <style scoped>
 main {
   text-align: center;
-  max-width: 800px;
+  max-width: 1100px;
   align-items: center;
   margin: 0 auto;
+  position: relative;
 }
 
 header {
   margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-filters {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -75,7 +100,7 @@ input {
   overflow: auto;
 }
 
-.button-group button {
+button {
   font-size: 1rem;
   height: 40px;
   display: grid;
@@ -91,7 +116,7 @@ input {
   transition: 0.3s;
 }
 
-.button-group button.active {
+button.active {
   background: #ffab2d;
   color: #fffbf4;
 }
@@ -102,17 +127,17 @@ h1 {
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem 1rem;
 }
 
 @media screen and (max-width: 1024px) {
   .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* TRANSITION CLASS NAMES */
+/* TRANSITION CLASS NAMES - DEFAULT */
 .v-move,
 .v-enter-active,
 .v-leave-active {
@@ -125,8 +150,21 @@ h1 {
   transform: translateY(10px);
 }
 
+/* TRANSITION GROUP CLASS NAMES - LIST */
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
 /* ADDING SOME STYLES TO THE EXIT TRANSITION CLASS CAN MAKE THE ANIMATION A LOT SMOOTHER */
-.v-leave-active {
+.list-leave-active {
   position: absolute;
   right: 0;
   left: 0;
